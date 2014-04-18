@@ -1,4 +1,4 @@
-phaser-multiplayer-game
+plane_fight-multiplayer-game
 ========================
 
 Simple real-time multiplayer phaser game which uses node and websockets.

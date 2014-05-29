@@ -47,6 +47,7 @@ function render() {
 //    game.debug.spriteBounds(player.plane);
 //    game.debug.body(player.plane);
 //    game.debug.spriteBounds(player.p2SnakeFollower);
+//    game.debug.text(game.time.fps, 400, 50 );
 
 }
 //

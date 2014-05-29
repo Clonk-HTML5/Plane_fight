@@ -11,28 +11,26 @@ Level = function(game) {
 Level.prototype = {
 
 	preload: function() {
-        this.game.load.image('sky', 'assets/img/sky.png');
-        this.game.load.image('sky_new', 'assets/img/sky_new.png');
-        this.game.load.image('clouds', 'assets/img/whiteclouds.png');
-        this.game.load.image('clouds1', 'assets/img/cloud_fluffy_1.png');
-        this.game.load.image('clouds2', 'assets/img/cloud_fluffy_2.png');
-//        this.game.load.image('clouds', 'assets/img/whiteclouds.png');
-//        this.game.load.image('MiddleGround', 'assets/img/smallermiddleground.png');
-//        this.game.load.image('MiddleGround', 'assets/img/middleground.png');
-//        this.game.load.image('ground', 'assets/img/stretchTerrain.png');
-        this.game.load.image('ground_old', 'assets/img/ground.png');
-        this.game.load.image('ground', 'assets/img/crosssection_long_new.png');
-        this.game.load.image('gras', 'assets/img/stretchGras.png');
-//        this.game.load.image('tree0', 'assets/img/tree_canopy_single_1.png');
-        this.game.load.image('tree0', 'assets/img/obj_trees1_001.png');
-        this.game.load.image('tree1', 'assets/img/obj_trees1_002.png');
-        this.game.load.image('tree2', 'assets/img/obj_trees1_003.png');
-        this.game.load.image('tree3', 'assets/img/obj_trees1_004.png');
-        this.game.load.image('tree4', 'assets/img/obj_trees1_005.png');
-        this.game.load.image('mountains', 'assets/img/mountains.png');
-//        this.game.load.image('ground', 'assets/img/bigTerrain.png');
-//        this.game.load.image('ground', 'assets/img/bigTerrainSmaller.png');
-//        this.game.load.image('parralax', 'assets/img/parralaxBg.png');
+        this.game.load.image('sky', 'assets/img/level/sky.png');
+        this.game.load.image('sky_new', 'assets/img/level/sky_new.png');
+        this.game.load.image('clouds', 'assets/img/level/whiteclouds.png');
+        this.game.load.image('clouds1', 'assets/img/level/cloud_fluffy_1.png');
+        this.game.load.image('clouds2', 'assets/img/level/cloud_fluffy_2.png');
+        this.game.load.image('ground', 'assets/img/level/crosssection_long_new.png');
+//        this.game.load.image('tree0', 'assets/img/level/tree_canopy_single_1.png');
+//        this.game.load.image('tree0', 'assets/img/level/trees/obj_trees1_001.png');
+//        this.game.load.image('tree1', 'assets/img/level/trees/obj_trees1_002.png');
+//        this.game.load.image('tree2', 'assets/img/level/trees/obj_trees1_003.png');
+//        this.game.load.image('tree3', 'assets/img/level/trees/obj_trees1_004.png');
+//        this.game.load.image('tree4', 'assets/img/level/trees/obj_trees1_005.png');
+        this.game.load.image('tree0', 'assets/img/level/trees/tree_coniferous_1.png');
+        this.game.load.image('tree1', 'assets/img/level/trees/tree_coniferous_3.png');
+        this.game.load.image('tree2', 'assets/img/level/trees/tree_coniferous_4.png');
+        this.game.load.image('tree3', 'assets/img/level/trees/tree_coniferous_4.png');
+        this.game.load.image('tree4', 'assets/img/level/trees/tree_deciduous3.png');
+        
+        
+        this.game.load.image('mountains', 'assets/img/level/mountains.png');
         
         //	Load our physcs data exported from PhysicsEditor
         // 	this.game.load.physics('terrainPD', 'assets/physics/terrain.json');
@@ -73,7 +71,7 @@ Level.prototype = {
             
             treeName = 'tree'+Math.round(Math.random() * 4);
             
-            var tree = this.game.add.sprite(Math.random() * this.game.world.width, 682, treeName);
+            var tree = this.game.add.sprite(Math.random() * this.game.world.width, 716, treeName);
             tree.scale.setTo(0.25, 0.25);
             
             var clouds = this.game.add.sprite(Math.random() * this.game.world.width, Math.random() * this.game.world.height - 400, 'clouds1');
@@ -100,13 +98,6 @@ Level.prototype = {
         
 //        var grasGround = this.game.add.sprite(0, 850, 'gras');
 //        grasGround.scale.setTo(1, 0.5);
-        
-//        this.rockEmitter = this.game.add.emitter(0, 0, 200);
-//        this.rockEmitter.maxParticleScale = 0.4;
-//        this.rockEmitter.minParticleScale = 0.2;
-//        this.rockEmitter.makeParticles('rock');
-//        this.rockEmitter.gravity = 0;
-
 	},
 
 	update: function() {

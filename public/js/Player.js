@@ -10,18 +10,27 @@ RemotePlayer = function (index, game, player, startX, startY, angle, bullets, bu
     this.player = player;
     this.alive = true;
     
-    //  Our bullet group
-//    this.bullets = this.game.add.group();
-//    this.bullets.enableBody = true;
-//    this.bullets.physicsBodyType = Phaser.Physics.ARCADE;
-    this.bullet = this.game.add.sprite(xBullet, yBullet, 'bullet');
-     this.game.physics.enable(this.bullet, Phaser.Physics.ARCADE);
+    this.emitter = this.game.add.emitter(this.game.world.centerX, this.game.world.centerY, 400);
+
+    this.emitter.makeParticles( [ 'smoke' ] );
+
+    this.emitter.gravity = 50;
+    this.emitter.setAlpha(1, 0, 1000);
+    this.emitter.setScale(0.1, 0, 0.05, 0, 1000);
+
+    this.emitter.start(false, 3000, 5);
     
-//    this.bullets.createMultiple(500, 'bullet');
-//    this.bullets.setAll('anchor.x', 0.5);
-//    this.bullets.setAll('anchor.y', 1);
-//    this.bullets.setAll('checkWorldBounds', true);
-//    this.bullets.setAll('outOfBoundsKill', true);
+    //  Our bullet group
+    this.bullets = this.game.add.group();
+    this.bullets.enableBody = true;
+    this.bullets.physicsBodyType = Phaser.Physics.ARCADE;
+    this.bullets.createMultiple(500, 'bullet2');
+    this.bullets.setAll('anchor.x', 0.5);
+    this.bullets.setAll('anchor.y', 1);
+    this.bullets.setAll('checkWorldBounds', true);
+    this.bullets.setAll('outOfBoundsKill', true);
+    this.bullets.setAll('scale.x', 0.5);
+    this.bullets.setAll('scale.y', 0.5);
     
     this.player = this.game.add.sprite(x, y, 'plane3');
     this.player.health = player.health;
@@ -34,6 +43,12 @@ RemotePlayer = function (index, game, player, startX, startY, angle, bullets, bu
 //        this.plane.scale.setTo(0.23, 0.23);
     this.game.physics.enable(this.player, Phaser.Physics.ARCADE);
     this.player.body.collideWorldBounds = true;
+    
+      this.hud = Phaser.Plugin.HUDManager.create(this.game, this, 'gamehud');
+      this.healthHUD = this.hud.addBar(0,-50, this.player.width, 10, this.player.health, 'health', this.player, '#ffbd55', false);
+      this.healthHUD.bar.anchor.setTo(0.5, 0.5);
+      this.player.addChild(this.healthHUD.bar);
+    
 };
 
         /**
@@ -45,10 +60,8 @@ RemotePlayer = function (index, game, player, startX, startY, angle, bullets, bu
         // Removes the star from the screen
         bullet.kill();
 
-        hud.playerHealth -= 5;
-        if (hud.playerHealth >= 0) {
-            hud.playerHealthText.setText('Health: ' + hud.playerHealth);
-        } else {
+        plane.health--;
+        if (plane.health < 1) {
             plane.kill();
         }
     };
@@ -65,6 +78,10 @@ Player = function (game) {
     this.plane = null;
     this.bullets = null;
     this.bulletTime = 0;
+    this.emitter = null;
+    this.hud = null;
+    this.score = 0;
+    this.scoreHUD = null;
     this.disableControls = false;
 
 };
@@ -75,9 +92,12 @@ Player.prototype = {
      * preload function
      */
     preload: function () {
-        this.game.load.image('plane3', 'assets/img/plane3.png');
-        this.game.load.image('smoke', 'assets/img/smoke.png');
-        this.game.load.image('bullet', 'assets/img/bullet.png');
+        this.game.load.image('plane3', 'assets/img/sprites/plane3.png');
+//        this.game.load.image('smoke', 'assets/img/sprites/smoke.png');
+        this.game.load.image('smoke_puff', 'assets/img/sprites/particles/smoke-puff.png');
+        this.game.load.image('smoke', 'assets/img/sprites/particles/pump_smoke_04.png');
+        this.game.load.image('bullet', 'assets/img/sprites/bullet.png');
+        this.game.load.image('bullet2', 'assets/img/sprites/bullet2.png');
     },
 
     /**
@@ -85,15 +105,27 @@ Player.prototype = {
      */
     create: function () {
         
+        this.emitter = this.game.add.emitter(this.game.world.centerX, this.game.world.centerY, 400);
+
+        this.emitter.makeParticles( [ 'smoke' ] );
+
+        this.emitter.gravity = 50;
+        this.emitter.setAlpha(1, 0, 1000);
+        this.emitter.setScale(0.1, 0, 0.05, 0, 1000);
+
+        this.emitter.start(false, 3000, 5);
+        
         //  Our bullet group
         this.bullets = this.game.add.group();
         this.bullets.enableBody = true;
         this.bullets.physicsBodyType = Phaser.Physics.ARCADE;
-        this.bullets.createMultiple(500, 'bullet');
+        this.bullets.createMultiple(500, 'bullet2');
         this.bullets.setAll('anchor.x', 0.5);
         this.bullets.setAll('anchor.y', 1);
         this.bullets.setAll('checkWorldBounds', true);
         this.bullets.setAll('outOfBoundsKill', true);
+        this.bullets.setAll('scale.x', 0.5);
+        this.bullets.setAll('scale.y', 0.5);
         
 
         this.plane = this.game.add.sprite(400, 400, 'plane3');
@@ -112,28 +144,36 @@ Player.prototype = {
         this.plane.body.maxVelocity.setTo(300, 300);
 //        this.plane.bringToTop();
         
+        this.scoreText = this.game.add.text(0, 0, '', { fontSize: '32px', fill: '#000' });
+        this.scoreText.fixedToCamera = true;
+        this.scoreText.cameraOffset.setTo(16, 16);
+    
+        var style = { font: '18px Arial', fill: '#ffffff', align: 'center'};
+      this.hud = Phaser.Plugin.HUDManager.create(this.game, this, 'gamehud');
+      this.scoreHUD = this.hud.addText(10, 10, 'Score: ', style, 'score', this);
+      this.scoreText.addChild(this.scoreHUD.text);
         
-//      this.score = 0;
-//        var style = { font: '18px Arial', fill: '#ffffff', align: 'center'};
-//      this.hud = Phaser.Plugins.HUDManager.createHud(this.game, this, 'gamehud');
-//      this.scoreHUD = this.hud.addText(10, 10, 'Score: ', style, 'score', this);
-//      this.game.add.existing(this.scoreHUD.text);
-        
-        
+      this.healthHUD = this.hud.addBar(0,-50, this.plane.width, 10, this.plane.health, 'health', this.plane, '#ffbd55', false);
+      this.healthHUD.bar.anchor.setTo(0.5, 0.5);
+      this.plane.addChild(this.healthHUD.bar);
+
         this.game.camera.follow(this.plane);
 
         this.cursors = this.game.input.keyboard.createCursorKeys();
         this.game.input.addPointer();
         
-        var element = document.getElementsByTagName('body')[0],
+        var element = document.getElementsByTagName('canvas')[0],
             _this = this;
         
-        var swipeup = Hammer(element).on("swipeup", function(event) {
-            console.log('swipeup')
+        var options = {
+          preventDefault: true
+        };
+        var hammertime = new Hammer(element, options);
+        hammertime.on("dragup swipeup", function(ev){ 
             _this.game.physics.arcade.velocityFromAngle(_this.plane.angle, 300, _this.plane.body.velocity);
             _this.plane.body.angularVelocity -= 100;
-        });  
-        var swipedown = Hammer(element).on("swipedown", function(event) {
+        });        
+        hammertime.on("dragdown swipedown", function(ev){ 
             _this.game.physics.arcade.velocityFromAngle(_this.plane.angle, 300, _this.plane.body.velocity);
             _this.plane.body.angularVelocity += 100;
         });
@@ -163,15 +203,17 @@ Player.prototype = {
           /**
          * Cursor functions starts
          */
-//        if (this.cursors.up.isDown) {
-//            this.game.physics.arcade.velocityFromAngle(this.plane.angle, 300, this.plane.body.velocity);
-//        } else if(this.cursors.down.isDown){
+        if (this.cursors.up.isDown) {
+            this.game.physics.arcade.velocityFromAngle(this.plane.angle, 600, this.plane.body.velocity);
+        } 
+//        else if(this.cursors.down.isDown){
 //            this.plane.body.velocity.setTo(0, 0)
 //        }
         if (this.cursors.left.isDown) {
 //            this.plane.body.rotateLeft(100);
             this.game.physics.arcade.velocityFromAngle(this.plane.angle, 300, this.plane.body.velocity);
             this.plane.body.angularVelocity -= 100;
+            this.score++;
         } else if (this.cursors.right.isDown) {
             this.game.physics.arcade.velocityFromAngle(this.plane.angle, 300, this.plane.body.velocity);
             this.plane.body.angularVelocity += 100;
@@ -189,6 +231,19 @@ Player.prototype = {
 ////            this.fireBullet();
 //        }
         
+        var px = this.plane.body.velocity.x;
+        var py = this.plane.body.velocity.y;
+
+        px *= -1;
+        py *= -1;
+
+        this.emitter.minParticleSpeed.set(px, py);
+        this.emitter.maxParticleSpeed.set(px, py);
+        
+        this.emitter.emitX = this.plane.x;
+        this.emitter.emitY = this.plane.y;
+        
+        
         gameInitializer.socket.emit("move player", {x: this.plane.x, y:this.plane.y, angle: this.plane.angle});
         
     },
@@ -201,18 +256,12 @@ Player.prototype = {
     shootPlayer: function (plane, bullet) {
         // Removes the star from the screen
         bullet.kill();
-        console.log(plane, bullet)
+//        console.log(plane, bullet)
         gameInitializer.socket.emit("bullet hit player", {playerId: plane.name});
-        plane.health -= 1
+        plane.health --;
         if(plane.health < 1){
             plane.kill();   
         }
-//        hud.playerHealth -= 5;
-//        if (hud.playerHealth >= 0) {
-//            hud.playerHealthText.setText('Health: ' + hud.playerHealth);
-//        } else {
-//            plane.kill();
-//        }
     },
     
     fireBullet: function() {
@@ -246,8 +295,7 @@ Player.prototype = {
         star.kill();
 
         //  Add and update the score
-        hud.score += 10;
-        hud.scoreText.setText('Score: ' + hud.score);
+        this.plane.score += 10;
     },
 
     /**
@@ -269,7 +317,6 @@ Player.prototype = {
     playerHitsBird: function (plane, bird) {
         // Removes the star from the screen
         bird.kill();
-        console.log(plane, bird)
         gameInitializer.socket.emit("bullet hit player", {playerId: plane.name});
         plane.health -= 1
         if(plane.health < 1){

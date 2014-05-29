@@ -92,25 +92,56 @@ GameInitializer.prototype = {
         movePlayer.player.x = data.x;
         movePlayer.player.y = data.y;
         movePlayer.player.angle = data.angle;
+        
+        var px = data.x;
+        var py = data.y;
+
+        px *= -1;
+        py *= -1;
+
+//        movePlayer.emitter.minParticleSpeed.set(px, py);
+//        movePlayer.emitter.maxParticleSpeed.set(px, py);
+        
+        movePlayer.emitter.emitX = data.x;
+        movePlayer.emitter.emitY = data.y;
 
     },
     // Player fires Bullet
     onFireBullet: function(data) {
 
-        var playerHowFired = gameInitializer.playerById(data.id);
+        var playerHowFired = gameInitializer.playerById(data.id),
+            bulletTime = 0;
 
         // Player not found
         if (!playerHowFired) {
             console.log("Player not found: "+data.id);
             return;
         };
-//        console.log(data)
-//        console.log(bullet.x, data.bulletX, bullet.rotation, data.bulletAngle)
+        
+       if (game.time.now > bulletTime)
+        {
+            var bullet = playerHowFired.bullets.getFirstExists(false);
+            
+//                               console.log(game.time.now, bullet)
+            
+            if (bullet)
+            {
+                bullet.reset(data.bulletX, data.bulletY);
+//                bullet.body.velocity.copyFrom(this.game.physics.arcade.velocityFromAngle(this.plane.angle, 1000))
+//                bullet.rotation = this.plane.rotation + this.game.math.degToRad(90);
+                bullet.lifespan = 2000;
+                 bullet.rotation = data.bulletAngle;
+                bullet.body.velocity.copyFrom(game.physics.arcade.velocityFromAngle(data.angle, 1000))
+//                game.physics.arcade.velocityFromRotation(data.angle, 1000, bullet.body.velocity);
+                bulletTime = game.time.now + 250;
+            }
+        }
+        
         // Update player position
-        playerHowFired.bullet.x = data.bulletX;
-        playerHowFired.bullet.y = data.bulletY;
-        playerHowFired.bullet.rotation = data.bulletAngle;
-        playerHowFired.bullet.body.velocity.copyFrom(game.physics.arcade.velocityFromAngle(data.angle, 1000))
+//        playerHowFired.bullet.x = data.bulletX;
+//        playerHowFired.bullet.y = data.bulletY;
+//        playerHowFired.bullet.rotation = data.bulletAngle;
+//        playerHowFired.bullet.body.velocity.copyFrom(game.physics.arcade.velocityFromAngle(data.angle, 1000))
 
     },
     // Player fires Bullet

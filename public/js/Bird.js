@@ -11,7 +11,7 @@ Bird = function(game) {
 Bird.prototype = {
 
 	preload: function () {
-        this.game.load.spritesheet('birdie', 'assets/img/bird.png', 189, 169, 3);
+        this.game.load.spritesheet('birdie', 'assets/img/sprites/bird.png', 189, 169, 3);
 	},
 
 	create: function () {
